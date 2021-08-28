@@ -9,9 +9,9 @@ class Runnable;
 class App
 {
 private:
-	sf::RenderWindow* window;
+	static sf::RenderWindow* window;
 	sf::Clock clock;
-	float deltaTime;
+	static float deltaTime;
 	static std::vector<Runnable*> runnables;
 	static std::vector<Drawable*> drawables;
 	static std::queue<Runnable*> newRunnables;
@@ -26,12 +26,13 @@ public:
 	~App();
 
 	int run();
-	float getDeltaTime() const;
+	static float getDeltaTime();
 	static void registerRunnable(Runnable* runnable);
 	static void registerDrawable(Drawable* drawable);
 	static void unregisterRunnable(Runnable* runnable);
 	static void unregisterDrawable(Drawable* drawable);
 	static sf::Vector2i getScreenSize();
+	static const sf::RenderWindow* getWindow();
 
 	// Paths //
 	static const std::string RESOURCES_PATH;

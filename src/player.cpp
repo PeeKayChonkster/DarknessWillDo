@@ -18,6 +18,8 @@ void Player::getInput(float delta)
 	using sf::Mouse;
 
 	glm::vec2 velocity(0.0f);
+
+	//// Keyboard Input ////
 	if (Keyboard::isKeyPressed(Keyboard::W))
 	{
 		velocity += glm::vec2(0.0f, -maxSpeed);
@@ -34,12 +36,24 @@ void Player::getInput(float delta)
 	{
 		velocity += glm::vec2(maxSpeed, 0.0f);
 	}
+	////////////////////////
 
-	velocity = chonky::clampVec(velocity, 0.0f, maxSpeed) * delta;
+	//// Mouse Input ////
+	if (Mouse::isButtonPressed(Mouse::Left))
+	{
+		// get global mouse coordinates
+		auto mousePosition = App::getWindow()->mapPixelToCoords(Mouse::getPosition(*App::getWindow()));
+		moveTarget = glm::vec2(float(mousePosition.x), float(mousePosition.y));
+	}
+	/////////////////////
+
+	//velocity = chonky::clampVec(velocity, 0.0f, maxSpeed) * delta;
+	float distance = glm::distance(moveTarget, getPosition());
 
 	// if there was input
-	if (glm::length(velocity) > 0.0f)
+	if (distance > 0.5f)
 	{
+		velocity = glm::normalize(moveTarget - getPosition()) * maxSpeed * delta;
 		// move according to input
 		move(velocity);
 		animationPlayer.play("walk");
@@ -48,6 +62,8 @@ void Player::getInput(float delta)
 		float angle = glm::angle(glm::normalize(velocity), glm::vec2(0.0f, 1.0f));
 		if (velocity.x < 0.0f) angle *= -1.0f;
 		float rotation = getRotation();
+		Debug::print("MoveTarget: " + std::to_string(moveTarget.x) + "||" + std::to_string(moveTarget.y));
+		Debug::print("Distance: " + std::to_string(distance));
 		float a = (chonky::lerpAngle(rotation, glm::degrees(angle), 0.3f));
 		setRotation(a);
 	}
@@ -60,6 +76,7 @@ void Player::getInput(float delta)
 void Player::start()
 {
 	Entity::start();
+	moveTarget = getPosition();
 	animationPlayer.createAnimation("idle", App::TEXTURES_PATH + "human_idle.png", 1, 0.15f);
 	animationPlayer.createAnimation("walk", App::TEXTURES_PATH + "human_walk_sheet.png", 8, 0.15f);
 	animationPlayer.play("idle");

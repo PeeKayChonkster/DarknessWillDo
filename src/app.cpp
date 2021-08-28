@@ -17,6 +17,8 @@
 const std::string App::RESOURCES_PATH = START_RESOURCE_PATH;
 const std::string App::TEXTURES_PATH = RESOURCES_PATH + START_TEXTURES_PATH;
 const std::string App::FONTS_PATH = RESOURCES_PATH + START_FONTS_PATH;
+sf::RenderWindow* App::window = nullptr;
+float App::deltaTime = 0.0f;
 std::vector<Runnable*> App::runnables;
 std::vector<Drawable*> App::drawables;
 std::queue<Runnable*> App::newRunnables;
@@ -26,13 +28,12 @@ unsigned int App::screenHeight = START_SCREEN_HEIGHT;
 ///////////////////////////////////
 
 
-App::App() : deltaTime(0.0f), window(nullptr)
+App::App()
 {
 }
 
 App::~App()
 {
-
 }
 
 int App::run()
@@ -109,7 +110,7 @@ void App::drawDrawables()
     }
 }
 
-float App::getDeltaTime() const
+float App::getDeltaTime()
 {
 	return deltaTime;
 }
@@ -168,4 +169,9 @@ void App::unregisterDrawable(Drawable* drawable)
 sf::Vector2i App::getScreenSize()
 {
     return sf::Vector2i(screenWidth, screenHeight);
+}
+
+const sf::RenderWindow* App::getWindow()
+{
+    return window;
 }

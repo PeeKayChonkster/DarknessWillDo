@@ -2,6 +2,7 @@
 #include "debug.h"
 #include "tools.h"
 
+
 Animation::Animation(std::string name, const std::string& texturePath, unsigned int hframes, float frameTime) : name(name), hframes(hframes), frameTime(frameTime), frame(0), frameWidth(0)
 {
 	if (!texture.loadFromFile(texturePath))
@@ -15,27 +16,23 @@ Animation::Animation(std::string name, const std::string& texturePath, unsigned 
 		boundingRect = sf::IntRect(0, 0, frameWidth, textureSize.y);
 		sprite.setTexture(texture);
 		sprite.setTextureRect(boundingRect);
-		sprite.setOrigin(frameWidth * (float(frame) + 0.5f), textureSize.y / 2.0f);
+		sprite.setOrigin(frameWidth * 0.5f, textureSize.y / 2.0f);
 	}
 }
 
-Animation::Animation(const Animation& other) : name(other.name), hframes(other.hframes), frameTime(other.frameTime), frame(other.frame), frameWidth(other.frameWidth)
+Animation::Animation(const Animation& other) : name(other.name), texture(other.texture), hframes(other.hframes), frameTime(other.frameTime), frame(other.frame), 
+	frameWidth(other.frameWidth), boundingRect(other.boundingRect)
 {
-	texture = other.texture;
 	auto textureSize = texture.getSize();
-	frameWidth = textureSize.x / hframes;
-	boundingRect = sf::IntRect(0, 0, frameWidth, textureSize.y);
 	sprite.setTexture(texture);
 	sprite.setTextureRect(boundingRect);
 	sprite.setOrigin(frameWidth * (float(frame) + 0.5f), textureSize.y / 2.0f);
 }
 
-Animation::Animation(Animation&& other) : name(other.name), hframes(other.hframes), frameTime(other.frameTime), frame(other.frame), frameWidth(other.frameWidth)
+Animation::Animation(Animation&& other) : name(other.name), texture(other.texture), hframes(other.hframes), frameTime(other.frameTime), frame(other.frame),
+	frameWidth(other.frameWidth), boundingRect(other.boundingRect)
 {
-	texture = other.texture;
 	auto textureSize = texture.getSize();
-	frameWidth = textureSize.x / hframes;
-	boundingRect = sf::IntRect(0, 0, frameWidth, textureSize.y);
 	sprite.setTexture(texture);
 	sprite.setTextureRect(boundingRect);
 	sprite.setOrigin(frameWidth * (float(frame) + 0.5f), textureSize.y / 2.0f);
