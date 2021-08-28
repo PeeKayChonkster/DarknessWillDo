@@ -2,8 +2,6 @@
 
 class Runnable
 {
-protected:
-	bool started = false;
 public:
 	Runnable();
 	~Runnable();

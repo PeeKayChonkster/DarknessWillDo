@@ -15,7 +15,7 @@ protected:
 	float maxSpeed;
 public:
 
-	Entity() = delete;
+	Entity();
 	Entity(const std::string& texturePath);
 	Entity(const Entity& other);
 	Entity& operator=(const Entity& other) = delete;

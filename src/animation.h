@@ -29,6 +29,7 @@ public:
 	std::string getName() const noexcept;
 	unsigned int getHframes() const noexcept;
 	unsigned int getFrame() const noexcept;
+	unsigned int getFrameWidth() const noexcept;
 	float getFrameTime() const noexcept;
 
 	void setPosition(const glm::vec2& vec);

@@ -1,6 +1,7 @@
 #pragma once
 #include "SFML/Graphics.hpp"
 #include <vector>
+#include <queue>
 
 class Drawable;
 class Runnable;
@@ -13,6 +14,7 @@ private:
 	float deltaTime;
 	static std::vector<Runnable*> runnables;
 	static std::vector<Drawable*> drawables;
+	static std::queue<Runnable*> newRunnables;
 	static unsigned int screenWidth, screenHeight;
 
 	void callUpdateCallbacks();

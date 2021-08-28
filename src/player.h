@@ -8,7 +8,7 @@ class Player : public Entity
 {
 private:
 public:
-	Player() = delete;
+	Player();
 	Player(const std::string& texturePath);
 	Player(const Player&) = delete;
 	Player& operator=(const Player&) = delete;

@@ -4,9 +4,12 @@
 #include "debug.h"
 #include "glm/gtc/quaternion.hpp"
 
+Player::Player()
+{
+}
+
 Player::Player(const std::string& texturePath) : Entity(texturePath)
 {
-	start();
 }
 
 void Player::getInput(float delta)
@@ -39,24 +42,27 @@ void Player::getInput(float delta)
 	{
 		// move according to input
 		move(velocity);
-
+		animationPlayer.play("walk");
 		// rotate in the direction of velocity
 		velocity.y *= -1.0f;
 		float angle = glm::angle(glm::normalize(velocity), glm::vec2(0.0f, 1.0f));
-		Debug::print("Angle: " + std::to_string(glm::degrees(angle)));
 		if (velocity.x < 0.0f) angle *= -1.0f;
 		float rotation = getRotation();
-		Debug::print("Player rotation: " + std::to_string(rotation));
 		float a = (chonky::lerpAngle(rotation, glm::degrees(angle), 0.3f));
 		setRotation(a);
+	}
+	else
+	{
+		animationPlayer.play("idle");
 	}
 }
 
 void Player::start()
 {
-	if (started) return;
-	started = true;
 	Entity::start();
+	animationPlayer.createAnimation("idle", App::TEXTURES_PATH + "human_idle.png", 1, 0.15f);
+	animationPlayer.createAnimation("walk", App::TEXTURES_PATH + "human_walk_sheet.png", 8, 0.15f);
+	animationPlayer.play("idle");
 }
 
 void Player::update(float delta)

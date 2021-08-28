@@ -13,13 +13,14 @@ AnimationPlayer::~AnimationPlayer()
 
 void AnimationPlayer::play(const std::string& animationName, bool looping)
 {
+	if (currentAnimation && currentAnimation->getName() == animationName) return;
 	auto predicate = [&animationName](const Animation& animation) { return animationName == animation.getName(); };
 	if (auto result = std::ranges::find_if(animations, predicate); result != animations.end())
 	{
+		stop();
 		loop = looping;
 		currentAnimation = &*result;
 		playing = true;
-
 	}
 }
 
@@ -35,7 +36,6 @@ void AnimationPlayer::draw(sf::RenderWindow* window)
 	{
 		currentAnimation->setPosition(getPosition());
 		currentAnimation->setRotation(getRotation());
-		Debug::print("AnimPlayer rotation: " + std::to_string(getRotation()));
 		currentAnimation->setScale(getScale());
 		currentAnimation->draw(window, playTime);
 	}
@@ -55,6 +55,7 @@ void AnimationPlayer::update(float delta)
 	if (currentAnimation->getHframes() > 1 && playing && currentAnimation)
 	{
 		playTime += delta;
+		Debug::print("frame: " + std::to_string(currentAnimation->getFrame()));
 		// if playTime is bigger than animation length, reset it. Stop if loop == false;
 		if (playTime > currentAnimation->getFrameTime() * currentAnimation->getHframes()) 
 		{
@@ -66,7 +67,8 @@ void AnimationPlayer::update(float delta)
 
 void AnimationPlayer::createAnimation(std::string animationName, const std::string& texturePath, unsigned int hframes, float frameTime)
 {
-	animations.emplace_back(animationName, texturePath, hframes, frameTime);
+	Animation newAnimation(animationName, texturePath, hframes, frameTime);
+	animations.push_back(newAnimation);
 }
 
 bool AnimationPlayer::isPlaying() const noexcept

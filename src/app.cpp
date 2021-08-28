@@ -4,6 +4,8 @@
 #include <ranges>
 #include "drawable.h"
 #include "runnable.h"
+#include <iostream>
+#include <exception>
 
 #define START_SCREEN_WIDTH 800u
 #define START_SCREEN_HEIGHT 800u
@@ -17,6 +19,8 @@ const std::string App::TEXTURES_PATH = RESOURCES_PATH + START_TEXTURES_PATH;
 const std::string App::FONTS_PATH = RESOURCES_PATH + START_FONTS_PATH;
 std::vector<Runnable*> App::runnables;
 std::vector<Drawable*> App::drawables;
+std::queue<Runnable*> App::newRunnables;
+
 unsigned int App::screenWidth = START_SCREEN_WIDTH;
 unsigned int App::screenHeight = START_SCREEN_HEIGHT;
 ///////////////////////////////////
@@ -39,7 +43,7 @@ int App::run()
     window->setVerticalSyncEnabled(true);
     window->setKeyRepeatEnabled(false);
     sf::Event event;
-    Player player(TEXTURES_PATH + "PlayerIdleDown.png");
+    Player player;
     player.setPosition(glm::vec2(screenWidth / 2.0f, screenHeight / 2.0f));
     ////////////////////////////
 
@@ -86,6 +90,11 @@ int App::run()
 
 void App::callUpdateCallbacks()
 {
+    while (!newRunnables.empty())
+    {
+        newRunnables.front()->start();
+        newRunnables.pop();
+    }
     for (auto& r : runnables)
     {
         r->update(deltaTime);
@@ -114,6 +123,7 @@ void App::registerRunnable(Runnable* runnable)
     else
     {
         runnables.push_back(runnable);
+        newRunnables.push(runnable);
     }
 }
 
