@@ -1,4 +1,5 @@
 #include "debug.h"
+#include "app.h"
 
 sf::Font Debug::font;
 bool Debug::initialized = false;

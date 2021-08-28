@@ -26,6 +26,7 @@ public:
 	void start() override;
 	void update(float delta) override;
 	void createAnimation(std::string animationName, const std::string& texturePath, unsigned int hframes, float frameTime);
+	const Animation* getCurrentAnimation() const;
 	bool isPlaying() const noexcept;
 };
 

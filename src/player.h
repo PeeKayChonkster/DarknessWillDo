@@ -1,14 +1,16 @@
 #pragma once
 #include "SFML/Graphics.hpp"
-#include "SFML/Audio.hpp"
 #include "entity.h"
 #include <string>
 #include "animationPlayer.h"
+#include "audioPlayer.h"
+
 
 class Player : public Entity
 {
 private:
 	glm::vec2 moveTarget;
+	AudioPlayer audioPlayer;
 public:
 	Player();
 	Player(const std::string& texturePath);

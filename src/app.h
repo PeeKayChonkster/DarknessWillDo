@@ -38,6 +38,8 @@ public:
 	static const std::string RESOURCES_PATH;
 	static const std::string TEXTURES_PATH;
 	static const std::string FONTS_PATH;
+	static const std::string SOUND_PATH;
+	static const std::string MUSIC_PATH;
 	///////////
 	
 };

@@ -6,17 +6,22 @@
 #include "runnable.h"
 #include <iostream>
 #include <exception>
+#include <random>
 
 #define START_SCREEN_WIDTH 800u
 #define START_SCREEN_HEIGHT 800u
 #define START_RESOURCE_PATH "Resources/"
 #define START_TEXTURES_PATH "Textures/"
 #define START_FONTS_PATH "Fonts/"
+#define START_SOUND_PATH "Sound/Sound/"
+#define START_MUSIC_PATH "Sound/Music/"
 
 // static members initialization //
 const std::string App::RESOURCES_PATH = START_RESOURCE_PATH;
 const std::string App::TEXTURES_PATH = RESOURCES_PATH + START_TEXTURES_PATH;
 const std::string App::FONTS_PATH = RESOURCES_PATH + START_FONTS_PATH;
+const std::string App::SOUND_PATH = RESOURCES_PATH + START_SOUND_PATH;
+const std::string App::MUSIC_PATH = RESOURCES_PATH + START_MUSIC_PATH;
 sf::RenderWindow* App::window = nullptr;
 float App::deltaTime = 0.0f;
 std::vector<Runnable*> App::runnables;
@@ -44,6 +49,7 @@ int App::run()
     window->setVerticalSyncEnabled(true);
     window->setKeyRepeatEnabled(false);
     sf::Event event;
+    srand(time(NULL));
     Player player;
     player.setPosition(glm::vec2(screenWidth / 2.0f, screenHeight / 2.0f));
     ////////////////////////////

@@ -2,6 +2,7 @@
 #include "app.h"
 #include "debug.h"
 #include <ranges>
+#include "SFML/Audio.hpp"
 
 AnimationPlayer::AnimationPlayer() : playTime(0.0f), playing(false), loop(true), currentAnimation(nullptr)
 {
@@ -37,6 +38,7 @@ void AnimationPlayer::draw(sf::RenderWindow* window)
 		currentAnimation->setPosition(getPosition());
 		currentAnimation->setRotation(getRotation());
 		currentAnimation->setScale(getScale());
+		Debug::print("Frame: " + std::to_string(currentAnimation->getFrame()));
 		currentAnimation->draw(window, playTime);
 	}
 }
@@ -55,7 +57,6 @@ void AnimationPlayer::update(float delta)
 	if (currentAnimation->getHframes() > 1 && playing && currentAnimation)
 	{
 		playTime += delta;
-		Debug::print("frame: " + std::to_string(currentAnimation->getFrame()));
 		// if playTime is bigger than animation length, reset it. Stop if loop == false;
 		if (playTime > currentAnimation->getFrameTime() * currentAnimation->getHframes()) 
 		{
@@ -69,6 +70,11 @@ void AnimationPlayer::createAnimation(std::string animationName, const std::stri
 {
 	Animation newAnimation(animationName, texturePath, hframes, frameTime);
 	animations.push_back(newAnimation);
+}
+
+const Animation* AnimationPlayer::getCurrentAnimation() const
+{
+	return currentAnimation;
 }
 
 bool AnimationPlayer::isPlaying() const noexcept

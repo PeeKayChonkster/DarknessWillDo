@@ -2,8 +2,6 @@
 #include "SFML/Graphics.hpp"
 #include <string>
 #include <vector>
-#include "app.h"
-#include "runnable.h"
 
 #define PLACE "File: " + __FILE__ + ". Line: " + std::to_string(__LINE__) + "."
 
