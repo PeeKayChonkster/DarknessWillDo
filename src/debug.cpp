@@ -12,7 +12,7 @@ bool Debug::initialize()
 	if (font.loadFromFile(App::FONTS_PATH + "RobotoSlab-VariableFont_wght.ttf"))
 	{
 		text.setFont(font);
-		text.setCharacterSize(24);
+		text.setCharacterSize(12);
 		text.setFillColor(sf::Color::White);
 		text.setPosition(100.0f, 100.0f);
 		initialized = true;

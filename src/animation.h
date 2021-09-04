@@ -39,6 +39,6 @@ public:
 	/////////////
 
 
-	void draw(sf::RenderWindow* window, float playTime);
+	void draw(sf::RenderTarget* window, float playTime);
 };
 

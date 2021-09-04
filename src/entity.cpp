@@ -1,5 +1,6 @@
 #include "entity.h"
 #include "app.h"
+#include "glm/gtx/vector_angle.hpp"
 
 /*
 Entity::Entity() : maxSpeed(0.1f)
@@ -10,17 +11,34 @@ Entity::Entity() : maxSpeed(0.1f)
 }
 */
 
-Entity::Entity() : Runnable(), maxSpeed(50.0f)
+#define MAX_WALK_SPEED 80.0f
+
+Entity::Entity() : Node(), maxSpeed(MAX_WALK_SPEED)
 {
 }
 
-Entity::Entity(const std::string& texturePath): Runnable(), maxSpeed(50.0f)
+Entity::Entity(Node* parent): Node(parent)
+{
+	maxSpeed = MAX_WALK_SPEED;
+}
+
+Entity::Entity(const glm::vec2& position): Node(position)
+{
+	maxSpeed = MAX_WALK_SPEED;
+}
+
+Entity::Entity(Node* parent, const glm::vec2& position) : Node(parent, position)
+{
+	maxSpeed = MAX_WALK_SPEED;
+}
+
+Entity::Entity(const std::string& texturePath): Node(), maxSpeed(MAX_WALK_SPEED)
 {
 	animationPlayer.createAnimation("default", texturePath, 1, 1.0f);
 	animationPlayer.play("default");
 }
 
-Entity::Entity(const Entity& other): Runnable(), maxSpeed(50.0f), animationPlayer(other.animationPlayer)
+Entity::Entity(const Entity& other): Node(), maxSpeed(MAX_WALK_SPEED), animationPlayer(other.animationPlayer)
 {
 }
 
@@ -31,6 +49,16 @@ Entity::~Entity()
 bool Entity::operator==(const Entity& other)
 {
 	return this == &other;
+}
+
+void Entity::rotate(glm::vec2 direction, float speed)
+{
+	speed = glm::clamp(speed, 0.0f, 1.0f);
+	direction.y *= -1.0f;
+	float angle = glm::angle(glm::normalize(direction), glm::vec2(0.0f, 1.0f));
+	if (direction.x < 0.0f) angle *= -1.0f;
+	float a = (chonky::lerpAngle(getRotation(), glm::degrees(angle), speed));
+	setRotation(a);
 }
 
 void Entity::start()

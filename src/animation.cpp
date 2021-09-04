@@ -87,7 +87,7 @@ void Animation::move(const glm::vec2& vec)
 	sprite.move(chonky::glm_to_sf_vec(vec));
 }
 
-void Animation::draw(sf::RenderWindow* window, float playTime)
+void Animation::draw(sf::RenderTarget* window, float playTime)
 {
 	if (hframes > 1)
 	{

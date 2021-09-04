@@ -4,7 +4,9 @@
 #include <ranges>
 #include "SFML/Audio.hpp"
 
-AnimationPlayer::AnimationPlayer() : playTime(0.0f), playing(false), loop(true), currentAnimation(nullptr)
+const std::string AnimationPlayer::type = "Animation Player";
+
+AnimationPlayer::AnimationPlayer() : playTime(0.0f), playing(false), loop(true), allowedToInterrupt(true),currentAnimation(nullptr)
 {
 }
 
@@ -12,33 +14,52 @@ AnimationPlayer::~AnimationPlayer()
 {
 }
 
-void AnimationPlayer::play(const std::string& animationName, bool looping)
+void AnimationPlayer::play(const std::string& animationName, bool looping, bool interruptable)
 {
-	if (currentAnimation && currentAnimation->getName() == animationName) return;
-	auto predicate = [&animationName](const Animation& animation) { return animationName == animation.getName(); };
-	if (auto result = std::ranges::find_if(animations, predicate); result != animations.end())
+	if (currentAnimation && currentAnimation->getName() == animationName)
 	{
-		stop();
-		loop = looping;
-		currentAnimation = &*result;
-		playing = true;
+		if (playing) return;
+		else playing = true;
+	}
+	else
+	{
+		if (playing && !allowedToInterrupt) return;
+		allowedToInterrupt = interruptable;
+		auto predicate = [&animationName](const Animation& animation) { return animationName == animation.getName(); };
+		if (auto result = std::ranges::find_if(animations, predicate); result != animations.end())
+		{
+			if(playing) stop();
+			loop = looping;
+			currentAnimation = &*result;
+			playing = true;
+		}
+		else
+		{
+			Debug::printPersistent("Didn't find animation to play. Name: " + animationName);
+		}
 	}
 }
 
+
+// TODO: this function stops drawing entirely, which is bad. Flickering occurs between animations.
+// This all happens because of wrong update order. Children should update before parents
 void AnimationPlayer::stop()
 {
-	playing = false;
 	playTime = 0.0f;
+	currentAnimation = nullptr;
+	playing = false;
 }
 
-void AnimationPlayer::draw(sf::RenderWindow* window)
+void AnimationPlayer::draw(sf::RenderTarget* window)
 {
-	if (playing && currentAnimation || currentAnimation && currentAnimation->getHframes() == 1)
+	if ((playing && currentAnimation) || (currentAnimation && currentAnimation->getHframes() == 1))
 	{
+		unsigned int a = currentAnimation->getHframes(); // TEMP
 		currentAnimation->setPosition(getPosition());
 		currentAnimation->setRotation(getRotation());
 		currentAnimation->setScale(getScale());
-		Debug::print("Frame: " + std::to_string(currentAnimation->getFrame()));
+		//Debug::print("Animation: " + currentAnimation->getName());
+		//Debug::print("Frame: " + std::to_string(currentAnimation->getFrame()));
 		currentAnimation->draw(window, playTime);
 	}
 }
@@ -47,7 +68,6 @@ void AnimationPlayer::start()
 {
 	if (currentAnimation)
 	{
-		stop();
 		playing = true;
 	}
 }

@@ -3,10 +3,11 @@
 #include "debug.h"
 #include <ranges>
 #include "drawable.h"
-#include "runnable.h"
+#include "node.h"
 #include <iostream>
 #include <exception>
 #include <random>
+#include <ranges>
 
 #define START_SCREEN_WIDTH 800u
 #define START_SCREEN_HEIGHT 800u
@@ -23,10 +24,13 @@ const std::string App::FONTS_PATH = RESOURCES_PATH + START_FONTS_PATH;
 const std::string App::SOUND_PATH = RESOURCES_PATH + START_SOUND_PATH;
 const std::string App::MUSIC_PATH = RESOURCES_PATH + START_MUSIC_PATH;
 sf::RenderWindow* App::window = nullptr;
+sf::Clock App::clock;
 float App::deltaTime = 0.0f;
-std::vector<Runnable*> App::runnables;
 std::vector<Drawable*> App::drawables;
-std::queue<Runnable*> App::newRunnables;
+std::queue<Node*> App::newNodes;
+std::queue<Node*> App::deletionQueue;
+
+Node App::root(glm::vec2(0.0f, 0.0f));
 
 unsigned int App::screenWidth = START_SCREEN_WIDTH;
 unsigned int App::screenHeight = START_SCREEN_HEIGHT;
@@ -50,8 +54,8 @@ int App::run()
     window->setKeyRepeatEnabled(false);
     sf::Event event;
     srand(time(NULL));
-    Player player;
-    player.setPosition(glm::vec2(screenWidth / 2.0f, screenHeight / 2.0f));
+    Player player(glm::vec2(screenWidth / 2.0f, screenHeight / 2.0f));
+    addToRoot(&player);
     ////////////////////////////
 
 
@@ -66,13 +70,17 @@ int App::run()
             // "close requested" event: we close the window
             if (event.type == sf::Event::Closed)
                 window->close();
-            if (event.type == sf::Event::Resized)
+            else if (event.type == sf::Event::Resized)
             {
                 // adjust view matrix to window size
                 sf::View newView(sf::FloatRect(0.0f, 0.0f, (float)event.size.width, (float)event.size.height));
                 screenWidth = event.size.width;
                 screenHeight = event.size.height;
                 window->setView(newView);
+            }
+            else
+            {
+                player.pushEvent(event);
             }
         }
 
@@ -81,30 +89,52 @@ int App::run()
 
 
         //// Game Loop ////
-        callUpdateCallbacks();
+        callCallbacks();
         ///////////////////
 
 
 
         // draw everything here...
         Debug::draw(window); // draw debug messages
-        drawDrawables();
+        drawDrawables();    // draw all registered drawables
         // end the current frame
         window->display();
     }
 	return 0;
 }
 
-void App::callUpdateCallbacks()
+void App::callCallbacks()
 {
-    while (!newRunnables.empty())
+    deleteNodes();
+    callUpdateCallback(&root);
+}
+
+void App::callStartCallbacks()
+{
+    while (!newNodes.empty())
     {
-        newRunnables.front()->start();
-        newRunnables.pop();
+        newNodes.front()->start();
+        newNodes.pop();
     }
-    for (auto& r : runnables)
+}
+
+void App::callUpdateCallback(Node* node)
+{
+    const auto children = node->getChildren();
+    for(int i = 0; i < children->size(); i++)
     {
-        r->update(deltaTime);
+        App::callUpdateCallback((*children)[i]);
+    }
+    node->update(App::getDeltaTime());
+}
+
+void App::deleteNodes()
+{
+    while (!deletionQueue.empty())
+    {
+        Node* n = deletionQueue.front();
+        delete n;
+        deletionQueue.pop();
     }
 }
 
@@ -121,17 +151,14 @@ float App::getDeltaTime()
 	return deltaTime;
 }
 
-void App::registerRunnable(Runnable* runnable)
+void App::registerNewNode(Node* node)
 {
-    if (std::ranges::find(runnables, runnable) != runnables.end())
+    auto children = node->getChildren();
+    for (auto& c : *children)
     {
-        return;
+        registerNewNode(c);
     }
-    else
-    {
-        runnables.push_back(runnable);
-        newRunnables.push(runnable);
-    }
+    node->start();
 }
 
 void App::registerDrawable(Drawable* drawable)
@@ -146,18 +173,6 @@ void App::registerDrawable(Drawable* drawable)
     }
 }
 
-void App::unregisterRunnable(Runnable* runnable)
-{
-    auto iter = std::ranges::find(runnables, runnable);
-    if (iter != runnables.end())
-    {
-        runnables.erase(iter);
-    }
-    else
-    {
-        return;
-    }
-}
 
 void App::unregisterDrawable(Drawable* drawable)
 {
@@ -172,6 +187,11 @@ void App::unregisterDrawable(Drawable* drawable)
     }
 }
 
+void App::registerForDeletion(Node* node)
+{
+    deletionQueue.push(node);
+}
+
 sf::Vector2i App::getScreenSize()
 {
     return sf::Vector2i(screenWidth, screenHeight);
@@ -180,4 +200,18 @@ sf::Vector2i App::getScreenSize()
 const sf::RenderWindow* App::getWindow()
 {
     return window;
+}
+
+const void App::addToRoot(Node* node)
+{
+    auto children = root.getChildren();
+    if (auto result = std::ranges::find(*children, node); result == children->end())
+    {
+        root.addChild(node);
+    }
+}
+
+const void App::removeFromRoot(Node* node)
+{
+    root.removeChild(node);
 }
