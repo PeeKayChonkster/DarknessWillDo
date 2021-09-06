@@ -26,9 +26,11 @@ bool Debug::initialize()
 
 void Debug::draw(sf::RenderWindow* const window)
 {
+	// lazy initialization
 	if (!initialized)
 		if (!initialize())
 			return;
+
 	std::string newText;
 	for (const auto& line : persistentLines)
 	{
@@ -40,7 +42,7 @@ void Debug::draw(sf::RenderWindow* const window)
 	}
 	lines.clear();
 	text.setString(newText);
-	text.setPosition(App::getScreenSize().x - text.getGlobalBounds().width - 10.0f, 10.0f);
+	text.setPosition(App::getWindowSize().x - text.getGlobalBounds().width - 10.0f, 10.0f);
 	window->draw(text);
 }
 

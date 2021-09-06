@@ -6,6 +6,7 @@
 class Drawable;
 class Runnable;
 class Node;
+class Player;
 
 /// <summary>
 /// Pure static class.
@@ -19,29 +20,34 @@ private:
 	static std::vector<Drawable*> drawables;
 	static std::queue<Node*> newNodes;
 	static std::queue<Node*> deletionQueue;
-	static unsigned int screenWidth, screenHeight;
+	static unsigned int windowWidth, windowHeight;
 	static Node root;
+	static Player* player;
 
+	static int init(const std::string windowName, unsigned int width = 800u, unsigned int height = 600u, bool fullscreen = false);
+	static void handleEvents();
+	static void clean();
+	static void update();
+	static void render();
 	static void callStartCallbacks();
 	static void callUpdateCallback(Node* node);
 	static void deleteNodes();
 	static void drawDrawables();
 
-	virtual void PureStaticClass() = 0;		/// virtual method for prohibition of instancing this class
+	virtual void ThisIsPureStaticClass() = 0;		/// virtual method to prohibit instantiation of this class
 public:
 	App();
 	App(const App&) = delete;
 	App& operator=(const App&) = delete;
 	~App();
 
-	static int run();
-	static void callCallbacks();
+	static int run(const std::string windowName, unsigned int width = 800u, unsigned int height = 600u, bool fullscreen = false);
 	static float getDeltaTime();
 	static void registerNewNode(Node* node);
 	static void registerDrawable(Drawable* drawable);
 	static void unregisterDrawable(Drawable* drawable);
 	static void registerForDeletion(Node* node);
-	static sf::Vector2i getScreenSize();
+	static sf::Vector2i getWindowSize();
 	static const sf::RenderWindow* getWindow();
 	static const void addToRoot(Node* node);
 	static const void removeFromRoot(Node* node);

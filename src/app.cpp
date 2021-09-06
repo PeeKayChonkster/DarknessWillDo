@@ -9,8 +9,6 @@
 #include <random>
 #include <ranges>
 
-#define START_SCREEN_WIDTH 800u
-#define START_SCREEN_HEIGHT 800u
 #define START_RESOURCE_PATH "Resources/"
 #define START_TEXTURES_PATH "Textures/"
 #define START_FONTS_PATH "Fonts/"
@@ -31,9 +29,10 @@ std::queue<Node*> App::newNodes;
 std::queue<Node*> App::deletionQueue;
 
 Node App::root(glm::vec2(0.0f, 0.0f));
+Player* App::player;
 
-unsigned int App::screenWidth = START_SCREEN_WIDTH;
-unsigned int App::screenHeight = START_SCREEN_HEIGHT;
+unsigned int App::windowWidth;
+unsigned int App::windowHeight;
 ///////////////////////////////////
 
 
@@ -45,68 +44,85 @@ App::~App()
 {
 }
 
-int App::run()
+int App::run(const std::string windowName, unsigned int width, unsigned int height, bool fullscreen)
 {
-    ////// Initialization //////
-    sf::RenderWindow newWindow(sf::VideoMode(START_SCREEN_WIDTH, START_SCREEN_HEIGHT), "SFML Tutorial!", sf::Style::Close);
-    window = &newWindow;
-    window->setVerticalSyncEnabled(true);
-    window->setKeyRepeatEnabled(false);
-    sf::Event event;
-    srand(time(NULL));
-    Player player(glm::vec2(screenWidth / 2.0f, screenHeight / 2.0f));
-    addToRoot(&player);
-    ////////////////////////////
-
+    init(windowName, width, height, fullscreen);
 
     while (window->isOpen())
     {
         // update deltaTime
         deltaTime = clock.restart().asSeconds();
-
-        // check all the window's events that were triggered since the last iteration of the loop
-        while (window->pollEvent(event))
-        {
-            // "close requested" event: we close the window
-            if (event.type == sf::Event::Closed)
-                window->close();
-            else if (event.type == sf::Event::Resized)
-            {
-                // adjust view matrix to window size
-                sf::View newView(sf::FloatRect(0.0f, 0.0f, (float)event.size.width, (float)event.size.height));
-                screenWidth = event.size.width;
-                screenHeight = event.size.height;
-                window->setView(newView);
-            }
-            else
-            {
-                player.pushEvent(event);
-            }
-        }
-
-        // clear the window with black color
-        window->clear(sf::Color::Black);
-
-
-        //// Game Loop ////
-        callCallbacks();
-        ///////////////////
-
-
-
-        // draw everything here...
-        Debug::draw(window); // draw debug messages
-        drawDrawables();    // draw all registered drawables
-        // end the current frame
-        window->display();
+        handleEvents();
+        update();
+        render();
     }
+
+    clean();
 	return 0;
 }
 
-void App::callCallbacks()
+int App::init(const std::string windowName, unsigned int width, unsigned int height, bool fullscreen)
+{
+    sf::VideoMode mode(width, height, 32u);
+    windowWidth = width;
+    windowHeight = height;
+    auto style = fullscreen ? sf::Style::Fullscreen : sf::Style::Close;
+    window = new sf::RenderWindow(mode, windowName, style);
+    window->setVerticalSyncEnabled(true);
+    window->setKeyRepeatEnabled(false);
+    srand(time(NULL));
+    player = new Player(glm::vec2(windowWidth / 2.0f, windowHeight / 2.0f));
+    addToRoot(player);
+    return 0;
+}
+
+void App::handleEvents()
+{
+    static sf::Event event;
+    // check all the window's events that were triggered since the last iteration of the loop
+    while (window->pollEvent(event))
+    {
+        // "close requested" event: we close the window
+        if (event.type == sf::Event::Closed)
+            window->close();
+        else if (event.type == sf::Event::Resized)
+        {
+            // adjust view matrix to window size
+            sf::View newView(sf::FloatRect(0.0f, 0.0f, (float)event.size.width, (float)event.size.height));
+            windowWidth = event.size.width;
+            windowHeight = event.size.height;
+            window->setView(newView);
+        }
+        else
+        {
+            player->pushEvent(event);
+        }
+    }
+}
+
+void App::clean()
+{
+    delete player;
+    delete window;
+}
+
+void App::update()
 {
     deleteNodes();
     callUpdateCallback(&root);
+}
+
+void App::render()
+{
+    // clear the window with black color
+    window->clear(sf::Color::Black);
+
+    // draw everything here...
+    Debug::draw(window); // draw debug messages
+    drawDrawables();    // draw all registered drawables
+
+    // end the current frame
+    window->display();
 }
 
 void App::callStartCallbacks()
@@ -192,9 +208,9 @@ void App::registerForDeletion(Node* node)
     deletionQueue.push(node);
 }
 
-sf::Vector2i App::getScreenSize()
+sf::Vector2i App::getWindowSize()
 {
-    return sf::Vector2i(screenWidth, screenHeight);
+    return sf::Vector2i(windowWidth, windowHeight);
 }
 
 const sf::RenderWindow* App::getWindow()
