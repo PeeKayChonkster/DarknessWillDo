@@ -5,9 +5,9 @@
 #include <string>
 #include "drawable.h"
 #include "animationPlayer.h"
-#include "node.h"
+#include "node2D.h"
 
-class Entity : public Node
+class Entity : public Node2D
 {
 protected:
 	AnimationPlayer animationPlayer;

@@ -3,10 +3,11 @@
 #include "debug.h"
 #include <ranges>
 #include "SFML/Audio.hpp"
+#include "node2D.h"
 
 const std::string AnimationPlayer::type = "Animation Player";
 
-AnimationPlayer::AnimationPlayer() : playTime(0.0f), playing(false), loop(true), allowedToInterrupt(true),currentAnimation(nullptr)
+AnimationPlayer::AnimationPlayer(const Node2D* target) : target(target), playTime(0.0f), playing(false), loop(true), allowedToInterrupt(true),currentAnimation(nullptr)
 {
 }
 
@@ -55,9 +56,9 @@ void AnimationPlayer::draw(sf::RenderTarget* window)
 	if ((playing && currentAnimation) || (currentAnimation && currentAnimation->getHframes() == 1))
 	{
 		unsigned int a = currentAnimation->getHframes(); // TEMP
-		currentAnimation->setPosition(getPosition());
-		currentAnimation->setRotation(getRotation());
-		currentAnimation->setScale(getScale());
+		currentAnimation->setPosition(target->getGlobalPosition());
+		currentAnimation->setRotation(target->getGlobalRotation());
+		currentAnimation->setScale(target->getGlobalScale());
 		//Debug::print("Animation: " + currentAnimation->getName());
 		//Debug::print("Frame: " + std::to_string(currentAnimation->getFrame()));
 		currentAnimation->draw(window, playTime);

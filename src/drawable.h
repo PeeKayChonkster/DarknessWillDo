@@ -6,7 +6,7 @@ class Drawable
 {
 public:
 	Drawable();
-	~Drawable();
+	virtual ~Drawable();
 
 	virtual void draw(sf::RenderTarget* window) = 0;
 };

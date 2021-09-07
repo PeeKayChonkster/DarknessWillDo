@@ -52,4 +52,4 @@ void Bullet::update(float delta)
 	}
 	else
 		return;
-}
+}    

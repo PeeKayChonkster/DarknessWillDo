@@ -11,22 +11,13 @@ Node::Node() : children(), parent(nullptr)
 
 Node::Node(Node* parent) : parent(parent) 
 {
-	parent->addChild(this);
+	if(parent)
+		parent->addChild(this);
 }
 
 Node::~Node() 
 { 
 	if (parent) parent->removeChild(this); 
-}
-
-Node::Node(const glm::vec2& position)
-{
-	setPosition(position);
-}
-
-Node::Node(Node* parent, const glm::vec2& position): Node(parent)
-{
-	setPosition(position);
 }
 
 void Node::addChild(Node* node)
@@ -35,9 +26,9 @@ void Node::addChild(Node* node)
 	children.push_back(node);
 	if (!node->parent) node->start();
 	node->parent = this;
-	node->setPosition(getPosition() + node->getPosition());
-	node->setRotation(getRotation() + node->getRotation());
-	node->setScale(getScale() * node->getScale());
+	//node->setPosition(getPosition() + node->getPosition());
+	//node->setRotation(getRotation() + node->getRotation());
+	//node->setScale(getScale() * node->getScale());
 }
 void Node::removeChild(Node* node)
 {
@@ -56,52 +47,7 @@ void Node::update(float deltaTime)
 {
 }
 
-// setters/getters //
-void Node::setPosition(const glm::vec2& vec)
-{
-	sf::Transformable::setPosition(chonky::glm_to_sf_vec(vec));
-	for (auto& c : children)
-	{
-		c->setPosition(getPosition());
-	}
-}
-void Node::setRotation(float angle)
-{
-	sf::Transformable::setRotation(angle);
-	for (auto& c : children)
-	{
-		c->setRotation(getRotation());
-	}
-}
-void Node::setScale(const glm::vec2& vec)
-{
-	sf::Transformable::setScale(chonky::glm_to_sf_vec(vec));
-	for (auto& c : children)
-	{
-		c->setScale(getScale());
-	}
-}
-void Node::move(const glm::vec2& vec)
-{
-	sf::Transformable::move(chonky::glm_to_sf_vec(vec));
-	for (auto& c : children)
-	{
-		c->move(vec);
-	}
-}
 
-glm::vec2 Node::getPosition() const noexcept
-{
-	return chonky::sf_to_glm_vec(sf::Transformable::getPosition());
-}
-float Node::getRotation() const noexcept
-{
-	return sf::Transformable::getRotation();
-}
-glm::vec2 Node::getScale() const noexcept
-{
-	return chonky::sf_to_glm_vec(sf::Transformable::getScale());
-}
 
 Node* Node::getParent() const noexcept
 {

@@ -28,7 +28,7 @@ std::vector<Drawable*> App::drawables;
 std::queue<Node*> App::newNodes;
 std::queue<Node*> App::deletionQueue;
 
-Node App::root(glm::vec2(0.0f, 0.0f));
+Node App::root;
 Player* App::player;
 
 unsigned int App::windowWidth;
@@ -115,7 +115,7 @@ void App::update()
 void App::render()
 {
     // clear the window with black color
-    window->clear(sf::Color::Black);
+    window->clear(sf::Color(50u, 50u, 50u, 255));
 
     // draw everything here...
     Debug::draw(window); // draw debug messages

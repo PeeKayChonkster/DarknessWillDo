@@ -6,10 +6,13 @@
 #include "SFML/Graphics.hpp"
 #include "node.h"
 
+class Node2D;
+
 class AnimationPlayer : public Drawable, public Node
 {
 private:
 	static const std::string type;
+	const Node2D* target;
 	std::vector<Animation> animations;
 	float playTime;
 	bool playing;
@@ -18,7 +21,7 @@ private:
 public:
 	bool loop;
 
-	AnimationPlayer();
+	AnimationPlayer(const Node2D* target);
 	~AnimationPlayer();
 
 	void play(const std::string& animationName, bool looping = true, bool interruptable = true);

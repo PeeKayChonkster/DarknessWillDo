@@ -13,32 +13,32 @@ Entity::Entity() : maxSpeed(0.1f)
 
 #define MAX_WALK_SPEED 80.0f
 
-Entity::Entity() : Node(), maxSpeed(MAX_WALK_SPEED)
+Entity::Entity() : Entity(nullptr, glm::vec2(0.0f))
 {
 }
 
-Entity::Entity(Node* parent): Node(parent)
-{
-	maxSpeed = MAX_WALK_SPEED;
-}
-
-Entity::Entity(const glm::vec2& position): Node(position)
+Entity::Entity(Node* parent): Entity(parent, glm::vec2(0.0f))
 {
 	maxSpeed = MAX_WALK_SPEED;
 }
 
-Entity::Entity(Node* parent, const glm::vec2& position) : Node(parent, position)
+Entity::Entity(const glm::vec2& position): Entity(nullptr, position)
 {
 	maxSpeed = MAX_WALK_SPEED;
 }
 
-Entity::Entity(const std::string& texturePath): Node(), maxSpeed(MAX_WALK_SPEED)
+Entity::Entity(Node* parent, const glm::vec2& position) : Node2D(parent, position), animationPlayer(this)
+{
+	maxSpeed = MAX_WALK_SPEED;
+}
+
+Entity::Entity(const std::string& texturePath): Node2D(), maxSpeed(MAX_WALK_SPEED), animationPlayer(this)
 {
 	animationPlayer.createAnimation("default", texturePath, 1, 1.0f);
 	animationPlayer.play("default");
 }
 
-Entity::Entity(const Entity& other): Node(), maxSpeed(MAX_WALK_SPEED), animationPlayer(other.animationPlayer)
+Entity::Entity(const Entity& other): Node2D(), maxSpeed(MAX_WALK_SPEED), animationPlayer(other.animationPlayer)
 {
 }
 
